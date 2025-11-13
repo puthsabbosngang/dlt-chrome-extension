@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Bulk Assign Collection Agent",
+  "version": "1.0",
+  "description": "Enable bulk assignment of collection agents on specified LOS pages.",
+  "permissions": ["scripting", "activeTab", "tabs"],
+  "host_permissions": [
+    "https://los-uat.luyleun.com/collection/list/over-due",
+    "https://los-uat.luyleun.com/collection/list/over-due?*",
+    "https://los-uat.luyleun.com/collection/list/on-due",
+    "https://los-uat.luyleun.com/collection/list/on-due?*",
+    "https://los-uat.luyleun.com/collection/list/before-due",
+    "https://los-uat.luyleun.com/collection/list/before-due?*",
+    "https://los-uat.luyleun.com/draft-application/list/new",
+    "https://los-uat.luyleun.com/draft-application/list/new?*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://los-uat.luyleun.com/collection/list/over-due",
+        "https://los-uat.luyleun.com/collection/list/over-due?*",
+        "https://los-uat.luyleun.com/collection/list/on-due",
+        "https://los-uat.luyleun.com/collection/list/on-due?*",
+        "https://los-uat.luyleun.com/collection/list/before-due",
+        "https://los-uat.luyleun.com/collection/list/before-due?*",
+        "https://los-uat.luyleun.com/draft-application/list/new",
+        "https://los-uat.luyleun.com/draft-application/list/new?*"
+      ],
+      "js": ["contentScript.js"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Bulk Assign Collection Agent"
+  }
+}
