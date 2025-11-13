@@ -1,15 +1,24 @@
-// Listen for messages from background.js
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "DRAFT_LIST_NEW") {
-    // You can trigger any logic here, e.g., re-inject UI or log page number
-    // Example: console.log('Draft List New page:', message.page);
-    // Optionally call injectBulkAssignUI() if needed
-    injectBulkAssignUI();
-  }
-});
-// Injects checkboxes, bulk assign button, and handles assignment logic
 
-// Utility: Only run on correct URLs
+// Utility: Get user role from the role chip
+function getUserRole() {
+  // Target the role chip specifically
+  const roleChip = document.querySelector('.MuiChip-label');
+  if (roleChip) {
+    return roleChip.textContent.trim();
+  }
+  return '';
+}
+
+function isRoleAllowed(role) {
+  return role === 'ADMIN' || role.endsWith('_SUPERVISOR');
+}
+
+function shouldEnableExtension() {
+  const role = getUserRole();
+  return isRoleAllowed(role);
+}
+
+
 const allowedPaths = [
   '/collection/list/over-due',
   '/collection/list/on-due',
@@ -21,7 +30,7 @@ function isAllowedPath() {
   return allowedPaths.some(path => window.location.pathname.endsWith(path));
 }
 
-// Wait for table to load
+
 function waitForTable() {
   return new Promise(resolve => {
     const interval = setInterval(() => {
@@ -34,18 +43,17 @@ function waitForTable() {
   });
 }
 
-// Inject checkboxes and bulk assign UI
+
 async function injectBulkAssignUI() {
   if (!isAllowedPath()) return;
   injectBulkAssignCSS();
   const table = await waitForTable();
   if (!table) return;
 
-  // Ensure table and parent containers have position: relative for sticky columns
+  
   table.style.position = 'relative';
   if (table.parentElement) table.parentElement.style.position = 'relative';
-
-  // Inject header checkbox inside 'Customer Info' <th>
+  
   const theadRow = table.querySelector('thead tr');
   if (theadRow) {
     const customerTh = Array.from(theadRow.querySelectorAll('th')).find(th => th.textContent.trim().toLowerCase().includes('customer info'));
@@ -57,8 +65,7 @@ async function injectBulkAssignUI() {
       customerTh.insertBefore(headerCb, customerTh.firstChild);
     }
   }
-
-  // Inject checkbox inside the customer info cell for each row
+  
   const rows = table.querySelectorAll('tbody tr');
   rows.forEach(row => {
     const customerTd = row.querySelector('td');
@@ -70,8 +77,7 @@ async function injectBulkAssignUI() {
       customerTd.insertBefore(cb, customerTd.firstChild);
     }
   });
-
-  // Header checkbox logic: select/deselect all
+  
   const headerCb = table.querySelector('.bulk-assign-header-checkbox');
   if (headerCb) {
     headerCb.onclick = () => {
@@ -81,22 +87,18 @@ async function injectBulkAssignUI() {
       });
     };
   }
-
-    // Add bulk assign controls if not present
-    if (!document.getElementById('bulk-assign-controls')) {
-      const controls = document.createElement('div');
-      controls.id = 'bulk-assign-controls';
-      controls.innerHTML = `
-        <select id="bulk-assign-agent" style="margin-right:8px;"></select>
-        <button id="bulk-assign-btn">Bulk Assign</button>
-      `;
-      document.body.appendChild(controls);
-
-      // Try to position the popup next to the Assignee column
-      const assigneeTh = Array.from(table.querySelectorAll('th')).find(th => th.textContent.trim().toLowerCase().includes('assignee'));
-      if (assigneeTh) {
-        const rect = assigneeTh.getBoundingClientRect();
-        controls.style.top = `${rect.top + window.scrollY + 8}px`;
+  if (!document.getElementById('bulk-assign-controls')) {
+    const controls = document.createElement('div');
+    controls.id = 'bulk-assign-controls';
+    controls.innerHTML = `
+      <select id="bulk-assign-agent" style="margin-right:8px;"></select>
+      <button id="bulk-assign-btn">Bulk Assign</button>
+    `;
+    document.body.appendChild(controls);
+    const assigneeTh = Array.from(table.querySelectorAll('th')).find(th => th.textContent.trim().toLowerCase().includes('assignee'));
+    if (assigneeTh) {
+      const rect = assigneeTh.getBoundingClientRect();
+      controls.style.top = `${rect.top + window.scrollY + 8}px`;
         controls.style.left = `${rect.right + window.scrollX + 16}px`;
         controls.style.right = '';
         controls.style.transform = 'none';
@@ -216,7 +218,7 @@ window.addEventListener('popstate', handleNavigation);
 });
 
 // Initial injection
-if (isAllowedPath()) injectBulkAssignUI();
+if (isAllowedPath() && shouldEnableExtension()) injectBulkAssignUI();
 observeUrlChange();
 
 // Inject CSS for bulk assign controls
@@ -230,7 +232,4 @@ function injectBulkAssignCSS() {
   document.head.appendChild(style);
 }
 
-injectBulkAssignCSS();
-// Initial injection
-if (isAllowedPath()) injectBulkAssignUI();
-observeUrlChange();
+

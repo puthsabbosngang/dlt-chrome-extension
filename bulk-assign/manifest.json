@@ -5,26 +5,18 @@
   "description": "Enable bulk assignment of collection agents on specified LOS pages.",
   "permissions": ["scripting", "activeTab", "tabs"],
   "host_permissions": [
-    "https://los-uat.luyleun.com/collection/list/over-due",
-    "https://los-uat.luyleun.com/collection/list/over-due?*",
-    "https://los-uat.luyleun.com/collection/list/on-due",
-    "https://los-uat.luyleun.com/collection/list/on-due?*",
-    "https://los-uat.luyleun.com/collection/list/before-due",
-    "https://los-uat.luyleun.com/collection/list/before-due?*",
-    "https://los-uat.luyleun.com/draft-application/list/new",
-    "https://los-uat.luyleun.com/draft-application/list/new?*"
+    "https://los-uat.luyleun.com/collection/list/over-due*",
+    "https://los-uat.luyleun.com/collection/list/on-due*",
+    "https://los-uat.luyleun.com/collection/list/before-due*",
+    "https://los-uat.luyleun.com/draft-application/list/new*"
   ],
   "content_scripts": [
     {
       "matches": [
-        "https://los-uat.luyleun.com/collection/list/over-due",
-        "https://los-uat.luyleun.com/collection/list/over-due?*",
-        "https://los-uat.luyleun.com/collection/list/on-due",
-        "https://los-uat.luyleun.com/collection/list/on-due?*",
-        "https://los-uat.luyleun.com/collection/list/before-due",
-        "https://los-uat.luyleun.com/collection/list/before-due?*",
-        "https://los-uat.luyleun.com/draft-application/list/new",
-        "https://los-uat.luyleun.com/draft-application/list/new?*"
+        "https://los-uat.luyleun.com/collection/list/over-due*",
+        "https://los-uat.luyleun.com/collection/list/on-due*",
+        "https://los-uat.luyleun.com/collection/list/before-due*",
+        "https://los-uat.luyleun.com/draft-application/list/new*"
       ],
       "js": ["contentScript.js"]
     }
